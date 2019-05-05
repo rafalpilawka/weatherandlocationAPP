@@ -1,0 +1,66 @@
+import React from 'react'
+
+
+const Result=({props}) =>{
+
+    const {value,date,temp,wind,pressure,sunrise,sunset,err,fetched, gmtOffset, icon} = props
+    // let timeToGMT = (offSet)=>{
+    //      if (offSet>=0){
+    //    return('+' + offSet.toString())
+    // } else {return offSet}
+    // }
+    // const weatherIcon = `http://openweathermap.org/img/w/${icon}`;
+   
+
+    if (fetched && !err && value.length !== 0){   
+        const sunriseTime= new Date(sunrise*1000).toLocaleTimeString()  
+        const sunsetTime = new Date(sunset*1000).toLocaleTimeString() 
+            return(
+            <div className="result">
+                <h1>{value}</h1>
+                <p>Today is <strong>{date}</strong> GMT {gmtOffset}</p>
+                <p>Temperature is <strong>{temp} &#176;C</strong></p>
+                <p>Wind speed <strong>{wind}</strong> m/s</p>
+                <p>Pressure <strong>{pressure}</strong> hPa</p>
+                <p>Sunrise at <strong>{sunriseTime}</strong></p>
+                <p>Sunset at <strong>{sunsetTime}</strong></p>
+                {/* <img alt="icon" src={weatherIcon} /> */}
+            </div>
+        )    
+    }else{
+        if(err){
+            return (<div className="result">City not found We dont have <strong>{value}</strong> in database.</div>)
+        }else{
+            return(
+            <div className="result">Type city</div>
+        )   
+        }    
+    }
+}
+// const Result=({props}) =>{
+//     if (props.fetched && !props.err){   
+//         const sunriseTime= new Date(props.sunrise*1000).toLocaleTimeString()  
+//         const sunsetTime = new Date(props.sunset*1000).toLocaleTimeString() 
+//             return(
+//             <div className="result">
+//                 <h1>{props.value}</h1>
+//                 <p>Today is <strong>{props.date}</strong></p>
+//                 <p>Temperature is <strong>{props.temp}</strong></p>
+//                 <p>Wind speed <strong>{props.wind}</strong> m/s</p>
+//                 <p>Pressure <strong>{props.pressure}</strong> hPa</p>
+//                 <p>Sunrise at <strong>{sunriseTime}</strong></p>
+//                 <p>Sunset at <strong>{sunsetTime}</strong></p>
+//             </div>
+//         )    
+//     }else{
+//         if(props.err){
+//             return (<div className="result">City not found We dont have <strong>{props.value}</strong> in database.</div>)
+//         }else{
+//             return(
+//             <div className="result">Type city</div>
+//         )   
+//         }    
+//     }
+// }
+
+export default Result
