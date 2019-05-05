@@ -3,7 +3,7 @@ import React from 'react'
 
 const Result=({props}) =>{
 
-    const {value,date,temp,wind,pressure,sunrise,sunset,err,fetched, gmtOffset, icon} = props
+    const {value,date,temp,wind,pressure,sunrise,sunset,err,fetched, gmtOffset, icon, verCity} = props
     // let timeToGMT = (offSet)=>{
     //      if (offSet>=0){
     //    return('+' + offSet.toString())
@@ -17,7 +17,7 @@ const Result=({props}) =>{
         const sunsetTime = new Date(sunset*1000).toLocaleTimeString() 
             return(
             <div className="result">
-                <h1>{value}</h1>
+                <h1>{verCity}</h1>
                 <p>Today is <strong>{date}</strong> GMT {gmtOffset}</p>
                 <p>Temperature is <strong>{temp} &#176;C</strong></p>
                 <p>Wind speed <strong>{wind}</strong> m/s</p>
