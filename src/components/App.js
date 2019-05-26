@@ -7,7 +7,7 @@ import Result from './Result'
 //API KEY 
 const APIGeoNames = 'rav260'
 const APIKey = '8168a4c8854af88f50ca9cac1374c07e'
-const APItimeZoneKey = '7PBO7M68F8PW'
+
 
 export default class App extends Component {
 
@@ -32,184 +32,166 @@ export default class App extends Component {
 
   
   inputChangeHandler=(e)=>{
+    console.log(e.target.value)
     this.setState({value: e.target.value})
   }
 
-  // gmtCheck=()=>{
-  //   const APItimeZone = `http://api.timezonedb.com/v2.1/get-time-zone?key=${APItimeZoneKey}&format=json&by=position&lat=${this.state.coord.lat}&lng=${this.state.coord.lng}`;
-  //   fetch(APItimeZone)
-  //     .then(res => { return res.json() })
-  //     .then(res => console.log(res))
-            
-  // }
-
-  // handleCitySubmit=(e)=>{
-  //   e.preventDefault();
-  //   console.log('form submitted');
-  //   // initialize API request
-    
-  //   const API = `http://api.openweathermap.org/data/2.5/weather?q=${this.state.value}&APPID=${APIKey}&units=metric`;
-  //  // const APItimeZone = `http://api.timezonedb.com/v2.1/get-time-zone?key=${APItimeZoneKey}&format=json&by=position&lat=${this.state.coord.lat}&lng=${this.state.coord.lng}`;
-    
-  //   fetch(API).then(res=>{
-  //     if(res.ok){
-  //      return res
-  //     }
-  //    throw Error(res.statusText)
-  //   })
-  //   .then(res =>{
-  //     // console.log('res.json ',res.json())
-  //     // console.log('status' + res.statusText)
-  //      return res.json() 
-  //   })
-  //   .then(data => {
-  //     // console.log('res.data.temp ', data.main.temp)
-  //     const date = new Date().toLocaleString()
-  //     this.setState(prevState => ({
-  //       err: false,
-  //       temp: data.main.temp,
-  //       pressure: data.main.pressure,
-  //       wind: data.wind.speed,
-  //       city: prevState.value,
-  //       country: data.sys.country,
-  //       sunrise: data.sys.sunrise,
-  //       sunset: data.sys.sunset,
-  //       date: date,
-  //       fetched: true,
-  //       gmtOffset: null
-
-  //     }))
-  //     console.log(data)
-  //     //Fetch for additional information
-  //     const APItimeZone = `http://api.timezonedb.com/v2.1/get-time-zone?key=${APItimeZoneKey}&format=json&by=position&lat=${data.coord.lat}&lng=${data.coord.lon}`;
-  //     fetch(APItimeZone).then(res=>{if(res.ok){
-  //                 return res
-  //                 }
-  //                 throw Error(res.statusText)
-  //               }).then(res=>{return res.json()}).then(res=>{
-  //                 console.log(res)
-  //                 let offset = ''
-  //                 if(res.gmtOffset>=0){
-  //                   offset = '+' +(res.gmtOffset / 3600).toString()
-  //                 }else{offset=res.gmtOffset / 3600}
-  //                 this.setState(prevState=>({
-  //                     gmtOffset: offset
-  //                 }))
-  //               })
-                
-  //               .catch(err=>console.log(err))
-  //   })
-  //   .catch(err=>{
-  //     console.log(err);
-  //     this.setState(prevState=>({
-  //       err: true,
-  //       city: prevState.value
-  //     }))
-  //   })
-  // }
-  checkError(){
-    this.state.err ? this.setState({err: false}) : console.log('err: false')
+calculateOffset(offset){
+      if (offset >= 0) {return   '+' + (offset / 3600).toString()
+      } else { return  offset / 3600 };
   }
-  componentDidUpdate(prevProps, prevState){
-    console.log(this.state)
 
-    if(this.state.value.length === 0){this.checkError()}
-    if (prevState.value !== this.state.value){
-    
-    // initialize API request for validation City
-    const APICityValidation =`http://api.geonames.org/searchJSON?q=${this.state.value}&maxRows=10&username=${APIGeoNames}`
-      
-    
-    //initialize API request for weather data
-    
-    
-    fetch(APICityValidation).then(res=>{
-        if(res.ok){
-          return res
-        }throw Error(res.statusText)
-      }).then(
-        res=>{return res.json()}
-      ).then(data=>{
-        this.setState({
-          verCity: data.geonames[0].toponymName
-        })
-        console.log('zwrotka  z geonames' , data.geonames[0].toponymName)
-        const API = `http://api.openweathermap.org/data/2.5/weather?q=${this.state.verCity}&APPID=${APIKey}&units=metric`;
-      
-            fetch(API).then(res => {
-              if (res.ok) {
-                return res
-              }
-              throw Error(res.statusText)
-            })
-              .then(res => {
-                // console.log('res.json ',res.json())
-                // console.log('status' + res.statusText)
-                return res.json()
-              })
-              .then(data => {
-                // console.log('res.data.temp ', data.main.temp)
-                console.log('ZAPYTANIE DO API', API)
-                const date = new Date().toLocaleString()
-                this.setState(prevState => ({
+async gettinData(city){
+    const API = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${APIKey}&units=metric`;
+    let data={}
+    const date = new Date().toLocaleString();
+    console.log(date )
+    try{
+      const response = await fetch(API);
+      const json = await response.json()
+      data = json
+       this.setState({
                   err: false,
                   temp: data.main.temp,
                   pressure: data.main.pressure,
                   wind: data.wind.speed,
-                  city: prevState.value,
+                  city: city,
                   country: data.sys.country,
                   sunrise: data.sys.sunrise,
                   sunset: data.sys.sunset,
                   date: date,
                   fetched: true,
-                  gmtOffset: null,
+                  gmtOffset: this.calculateOffset(data.timezone),
                   icon: data.weather[0].icon,
                   coord: { lat: data.coord.lat, lng: data.coord.lon }
+     });
+    }
+    catch(err){
+      this.setState({err: true})
+    }
+    console.log(data)
+    return data
+}
 
-                }))
-                return data;
+async validateCityName(){
+    let city= ''
+    const APICityValidation = `http://api.geonames.org/searchJSON?q=${this.state.value}&maxRows=10&username=${APIGeoNames}`;
+  console.log("check api get", APICityValidation)
+    try{
+        const response =  await fetch(APICityValidation) 
+        const json = await response.json()
+        console.log(json)
+        city = await json.geonames[0].toponymName;
+    }
+    catch(e){
+      this.setState({err:true})
+    }
+    console.log(city)
+    return city
+}
+
+  checkError(){
+    this.state.err ? this.setState({err: false}) : console.log('err: false')
+}
 
 
-              }) // console.log("data from open weather" , data.weather[0].icon)
+async componentDidUpdate(prevProps, prevState){
 
-              //Fetch for additional information for GMT Offset
-                          .then(data => {
-                            const APItimeZone = `http://api.timezonedb.com/v2.1/get-time-zone?key=${APItimeZoneKey}&format=json&by=position&lat=${data.coord.lat}&lng=${data.coord.lon}`;
-                            setTimeout(() => {
-                              fetch(APItimeZone).then(res => {
-                                if (res.ok) {
-                                  return res
-                                }
-                                throw Error(res.statusText)
-                              }).then(res => { return res.json() }).then(res => {
-                                console.log(res)
-                                let offset = ''
-                                if (res.gmtOffset >= 0) {
-                                  offset = '+' + (res.gmtOffset / 3600).toString()
-                                } else { offset = res.gmtOffset / 3600 }
-                                this.setState(prevState => ({
-                                  gmtOffset: offset
-                                }))
-                              })
+    if(this.state.value.length === 0){this.checkError()}
+    if (prevState.value !== this.state.value){
+    
+    // initialize API request for validation City
+      
+    
+    //initialize API request for weather data
+    let city = await this.validateCityName()
+    console.log(city)
+    let data =   await this.gettinData(city)
+  // await console.log(data.main.pressure)
+    const date = new Date().toLocaleString();
+    // if(data){
+    //   this.setState(prevState => ({
+    //               err: false,
+    //               temp: data.main.temp,
+    //               pressure: data.main.pressure,
+    //               wind: data.wind.speed,
+    //               city: prevState.value,
+    //               country: data.sys.country,
+    //               sunrise: data.sys.sunrise,
+    //               sunset: data.sys.sunset,
+    //               date: date,
+    //               fetched: true,
+    //               gmtOffset: this.calculateOffset(data.timezone),
+    //               icon: data.weather[0].icon,
+    //               coord: { lat: data.coord.lat, lng: data.coord.lon }
+    //  }));
+    // } 
+    
+  //   fetch(APICityValidation).then(res=>{
+  //       if(res.ok){
+  //         return res
+  //       }throw Error(res.statusText)
+  //     }).then(
+  //       res=>{return res.json()}
+  //     ).then(data=>{
+  //       this.setState({
+  //         verCity: data.geonames[0].toponymName
+  //       })
+  //       console.log('zwrotka  z geonames' , data.geonames[0].toponymName)
+  //       const API = `http://api.openweathermap.org/data/2.5/weather?q=${this.state.verCity}&APPID=${APIKey}&units=metric`;
+      
+  //           fetch(API).then(res => {
+  //             if (res.ok) {
+  //               return res
+  //             }
+  //             throw Error(res.statusText)
+  //           })
+  //             .then(res => {
+  //               return res.json()
+  //             })
+  //             .then(data => {
+  //               console.log('ZAPYTANIE DO API weather', data)
+  //               const date = new Date().toLocaleString()
+                
+                
+  //               this.setState(prevState => ({
+  //                 err: false,
+  //                 temp: data.main.temp,
+  //                 pressure: data.main.pressure,
+  //                 wind: data.wind.speed,
+  //                 city: prevState.value,
+  //                 country: data.sys.country,
+  //                 sunrise: data.sys.sunrise,
+  //                 sunset: data.sys.sunset,
+  //                 date: date,
+  //                 fetched: true,
+  //                 gmtOffset: this.calculateOffset(data.timezone),
+  //                 icon: data.weather[0].icon,
+  //                 coord: { lat: data.coord.lat, lng: data.coord.lon }
 
-                              .catch(err => console.log(err))
-                            }, 1000)
-                          })
-              .catch(err => {
-                console.log(err);
-                this.setState(prevState => ({
-                  err: true,
-                  city: prevState.value
-                }))
-              })
-      }
-      )
-        .catch(err => {
-          console.log(err);
+  //               }))
+  //               return data;
+
+  //             }) 
+  //               .catch(err => {
+  //                 console.log(err);
+  //                 this.setState(prevState => ({
+  //                   err: true,
+  //                   city: prevState.value
+  //                 }))
+  //               })
+  //     }
+  //     )
+  //       .catch(err => {
+  //         console.log(err);
        
     
-  })}}
-  
+  // })
+}
+}
+
+
+
 
   render() {
     
@@ -220,13 +202,16 @@ export default class App extends Component {
   };
     return (
       <div className="App" style={stylized}>
-        
-        <Form clicked={this.clicked}
-         value={this.state.value} 
-         changed={this.inputChangeHandler} ></Form>
+        <Form
+          clicked={this.clicked}
+          value={this.state.value}
+          changed={this.inputChangeHandler}
+        />
         <Result props={this.state} />
+        
+        <button className="btn" onClick={()=>console.log(this.state)}>Sprawdz State</button>
       </div>
-    )
+    );
   }
 }
 

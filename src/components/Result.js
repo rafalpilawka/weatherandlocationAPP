@@ -3,7 +3,7 @@ import React from 'react'
 
 const Result=({props}) =>{
 
-    const {value,date,temp,wind,pressure,sunrise,sunset,err,fetched, gmtOffset, icon, verCity} = props
+    const {value,date,temp,wind,pressure,sunrise,sunset,err,fetched, gmtOffset, city, country,icon} = props
     // let timeToGMT = (offSet)=>{
     //      if (offSet>=0){
     //    return('+' + offSet.toString())
@@ -17,14 +17,16 @@ const Result=({props}) =>{
         const sunsetTime = new Date(sunset*1000).toLocaleTimeString() 
             return(
             <div className="result">
-                <h1>{verCity}</h1>
-                <p>Today is <strong>{date}</strong> GMT {gmtOffset}</p>
-                <p>Temperature is <strong>{temp} &#176;C</strong></p>
-                <p>Wind speed <strong>{wind}</strong> m/s</p>
-                <p>Pressure <strong>{pressure}</strong> hPa</p>
-                <p>Sunrise at <strong>{sunriseTime}</strong></p>
-                <p>Sunset at <strong>{sunsetTime}</strong></p>
-                {/* <img alt="icon" src={weatherIcon} /> */}
+                <h1>{city}</h1>
+                <p>Country code : {country}</p>
+                <p>GMT offset: <strong>{gmtOffset}</strong></p>
+                <p>Today is <strong>{date}</strong> </p>
+                <p>Temperature : <strong>{temp} &#176;C</strong></p>
+                <p>Wind speed: <strong>{wind}</strong> m/s</p>
+                <p>Pressure: <strong>{pressure}</strong> hPa</p>
+                <p>Sunrise at: <strong>{sunriseTime}</strong></p>
+                <p>Sunset at: <strong>{sunsetTime}</strong></p>
+                <img src={"http://openweathermap.org/img/w/"+icon+".png"} alt="weatherIcon" />
             </div>
         )    
     }else{
@@ -32,7 +34,7 @@ const Result=({props}) =>{
             return (<div className="result">City not found We dont have <strong>{value}</strong> in database.</div>)
         }else{
             return(
-            <div className="result">Type city</div>
+            <div className="result">Pease type city to check current weather info</div>
         )   
         }    
     }
